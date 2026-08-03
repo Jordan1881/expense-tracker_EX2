@@ -1,10 +1,17 @@
+import { useState } from "react";
+import { CategoriesPanel } from "./components/CategoriesPanel";
+
 function App() {
+  const [categoriesOpen, setCategoriesOpen] = useState(false);
+
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
       <header className="border-b border-slate-200 bg-white px-6 py-4">
-        <h1 className="text-2xl font-semibold tracking-tight">Expense Tracker</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">
+          Expense Tracker
+        </h1>
         <p className="mt-1 text-sm text-slate-600">
-          Scaffold ready — features land via TDD after approval.
+          Track spending by category and currency.
         </p>
       </header>
 
@@ -27,15 +34,21 @@ function App() {
             <button
               type="button"
               className="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50"
+              onClick={() => setCategoriesOpen(true)}
             >
               Manage categories
             </button>
           </div>
           <p className="mt-2 text-sm text-slate-500">
-            List + filters placeholder · categories panel/slide-over later
+            List + filters placeholder
           </p>
         </section>
       </div>
+
+      <CategoriesPanel
+        open={categoriesOpen}
+        onClose={() => setCategoriesOpen(false)}
+      />
     </main>
   );
 }

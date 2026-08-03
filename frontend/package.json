@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "oxlint",
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit",
     "test": "vitest run --config vitest.config.ts",
@@ -25,7 +24,6 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.4",
     "jsdom": "^26.1.0",
-    "oxlint": "^1.75.0",
     "tailwindcss": "^4.1.11",
     "typescript": "~5.9.2",
     "vite": "^8.2.0",
