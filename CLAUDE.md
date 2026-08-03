@@ -74,7 +74,9 @@ Do not invent parallel top-level folders without approval.
 - Frontend: `http://localhost:5173`
 - Backend: `http://localhost:3001`
 - REST prefix: `/api` — e.g. `/api/expenses`, `/api/categories`, `/api/health`
-- CORS: allow Vite origin in development
+- CORS: allow Vite origin(s) in development (comma-separated `FRONTEND_ORIGIN` supported for worktree/E2E ports)
+- On API boot, seed categories are upserted so Food…Other exist without a separate manual step for local/E2E runs
+
 
 ## UI shell (target)
 
