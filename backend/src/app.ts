@@ -3,7 +3,7 @@ import express from "express";
 import type { PrismaClient } from "@prisma/client";
 import { getPrisma } from "./db.js";
 import { createCategoriesRouter } from "./routes/categories.js";
-import { expensesRouter } from "./routes/expenses.js";
+import { createExpensesRouter } from "./routes/expenses.js";
 import { healthRouter } from "./routes/health.js";
 
 export type AppDeps = {
@@ -19,7 +19,7 @@ export function createApp(deps: AppDeps = {}) {
   app.use(express.json());
 
   app.use("/api/health", healthRouter);
-  app.use("/api/expenses", expensesRouter);
+  app.use("/api/expenses", createExpensesRouter(prisma));
   app.use("/api/categories", createCategoriesRouter(prisma));
 
   return app;

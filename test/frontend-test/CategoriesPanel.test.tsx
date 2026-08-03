@@ -38,6 +38,9 @@ describe("Manage Categories panel", () => {
         if (url.endsWith("/categories") && method === "GET") {
           return jsonResponse(seedCategories);
         }
+        if (url.endsWith("/expenses") && method === "GET") {
+          return jsonResponse([]);
+        }
         return jsonResponse({ error: "Unexpected request" }, 500);
       },
     );
