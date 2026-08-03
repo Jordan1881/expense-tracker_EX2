@@ -1,5 +1,2 @@
-/**
- * Controllers will map HTTP <-> services.
- * Implement with TDD when features are approved.
- */
+/** Controllers live alongside routes; categories handlers are in routes/categories.ts for this slice. */
 export {};
