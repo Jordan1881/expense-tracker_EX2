@@ -8,13 +8,19 @@ describe("App shell", () => {
       "fetch",
       vi.fn(async (input: RequestInfo | URL) => {
         const url = String(input);
-        if (url.endsWith("/expenses")) {
+        if (url.includes("/expenses")) {
           return new Response(JSON.stringify([]), {
             status: 200,
             headers: { "Content-Type": "application/json" },
           });
         }
-        if (url.endsWith("/categories")) {
+        if (url.includes("/summary")) {
+          return new Response(JSON.stringify([]), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+        if (url.includes("/categories")) {
           return new Response(JSON.stringify([]), {
             status: 200,
             headers: { "Content-Type": "application/json" },

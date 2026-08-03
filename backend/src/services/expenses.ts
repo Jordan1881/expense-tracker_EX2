@@ -189,6 +189,47 @@ export function createExpenseService(prisma: PrismaClient) {
       });
       return toDto(expense);
     },
+
+    async update(id: string, body: CreateExpenseInput): Promise<ExpenseDto> {
+      const existing = await prisma.expense.findUnique({ where: { id } });
+      if (!existing) {
+        throw new ExpenseError("Expense not found", 404);
+      }
+
+      const amountMinor = parseAmountMinor(body.amountMinor);
+      const currency = parseCurrency(body.currency);
+      const date = parseDate(body.date);
+      const note = parseNote(body.note);
+      const categoryId = parseCategoryId(body.categoryId);
+
+      const category = await prisma.category.findUnique({
+        where: { id: categoryId },
+      });
+      if (!category) {
+        throw new ExpenseError("Category not found", 404);
+      }
+
+      const expense = await prisma.expense.update({
+        where: { id },
+        data: {
+          amountMinor,
+          currency,
+          date,
+          note,
+          categoryId,
+        },
+        include: { category: { select: { id: true, name: true } } },
+      });
+      return toDto(expense);
+    },
+
+    async remove(id: string): Promise<void> {
+      const existing = await prisma.expense.findUnique({ where: { id } });
+      if (!existing) {
+        throw new ExpenseError("Expense not found", 404);
+      }
+      await prisma.expense.delete({ where: { id } });
+    },
   };
 }
 

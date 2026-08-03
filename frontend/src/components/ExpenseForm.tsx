@@ -4,17 +4,25 @@ import {
   DEFAULT_CURRENCY,
   type CurrencyCode,
 } from "../constants/domain";
-import type { Category } from "../types/expense";
+import type { Category, Expense } from "../types/expense";
 import { listCategories } from "../utils/categoriesApi";
-import { createExpense } from "../utils/expensesApi";
+import { createExpense, updateExpense } from "../utils/expensesApi";
 import { formatMoney } from "../utils/money";
 
 type ExpenseFormProps = {
-  onCreated: () => void;
+  onSaved: () => void;
+  editing?: Expense | null;
+  onCancelEdit?: () => void;
+  /** Bump after category manage so the select reloads. */
+  categoriesRevision?: number;
 };
 
 function todayIsoDate(): string {
   return new Date().toISOString().slice(0, 10);
+}
+
+function minorToMajorInput(amountMinor: number): string {
+  return (amountMinor / 100).toFixed(2);
 }
 
 /** Convert a major-unit decimal string (e.g. "49.90") to integer minor units. */
@@ -32,7 +40,12 @@ function majorToMinor(raw: string): number | null {
   return minor;
 }
 
-export function ExpenseForm({ onCreated }: ExpenseFormProps) {
+export function ExpenseForm({
+  onSaved,
+  editing = null,
+  onCancelEdit,
+  categoriesRevision = 0,
+}: ExpenseFormProps) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [amount, setAmount] = useState("");
   const [currency, setCurrency] = useState<CurrencyCode>(DEFAULT_CURRENCY);
@@ -46,11 +59,16 @@ export function ExpenseForm({ onCreated }: ExpenseFormProps) {
   useEffect(() => {
     let cancelled = false;
     void (async () => {
+      setLoadingCategories(true);
       try {
         const list = await listCategories();
         if (cancelled) return;
         setCategories(list);
-        setCategoryId((current) => current || list[0]?.id || "");
+        setCategoryId((current) =>
+          current && list.some((c) => c.id === current)
+            ? current
+            : list[0]?.id || "",
+        );
       } catch (err) {
         if (!cancelled) {
           setError(
@@ -64,7 +82,24 @@ export function ExpenseForm({ onCreated }: ExpenseFormProps) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [categoriesRevision]);
+
+  useEffect(() => {
+    if (editing) {
+      setAmount(minorToMajorInput(editing.amountMinor));
+      setCurrency(editing.currency);
+      setDate(editing.date);
+      setCategoryId(editing.categoryId);
+      setNote(editing.note ?? "");
+      setError(null);
+      return;
+    }
+    setAmount("");
+    setCurrency(DEFAULT_CURRENCY);
+    setDate(todayIsoDate());
+    setNote("");
+    setError(null);
+  }, [editing]);
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -84,22 +119,34 @@ export function ExpenseForm({ onCreated }: ExpenseFormProps) {
       return;
     }
 
+    const payload = {
+      amountMinor,
+      currency,
+      date,
+      categoryId,
+      ...(note.trim() ? { note: note.trim() } : {}),
+    };
+
     setSubmitting(true);
     try {
-      await createExpense({
-        amountMinor,
-        currency,
-        date,
-        categoryId,
-        ...(note.trim() ? { note: note.trim() } : {}),
-      });
+      if (editing) {
+        await updateExpense(editing.id, payload);
+      } else {
+        await createExpense(payload);
+      }
       setAmount("");
       setNote("");
       setCurrency(DEFAULT_CURRENCY);
       setDate(todayIsoDate());
-      onCreated();
+      onSaved();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to add expense");
+      setError(
+        err instanceof Error
+          ? err.message
+          : editing
+            ? "Failed to update expense"
+            : "Failed to add expense",
+      );
     } finally {
       setSubmitting(false);
     }
@@ -107,6 +154,19 @@ export function ExpenseForm({ onCreated }: ExpenseFormProps) {
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit} noValidate>
+      {editing ? (
+        <p className="text-sm text-slate-600">
+          Editing expense ·{" "}
+          <button
+            type="button"
+            className="underline"
+            onClick={() => onCancelEdit?.()}
+          >
+            Cancel
+          </button>
+        </p>
+      ) : null}
+
       <div>
         <label htmlFor="expense-amount" className="block text-sm font-medium">
           Amount
@@ -209,7 +269,13 @@ export function ExpenseForm({ onCreated }: ExpenseFormProps) {
         className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
         disabled={submitting || loadingCategories}
       >
-        {submitting ? "Adding…" : "Add expense"}
+        {submitting
+          ? editing
+            ? "Saving…"
+            : "Adding…"
+          : editing
+            ? "Save changes"
+            : "Add expense"}
       </button>
     </form>
   );

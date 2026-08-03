@@ -16,5 +16,13 @@ export function createExpensesRouter(prisma: PrismaClient) {
     void controller.create(req, res);
   });
 
+  router.patch("/:id", (req, res) => {
+    void controller.update(req, res);
+  });
+
+  router.delete("/:id", (req, res) => {
+    void controller.remove(req, res);
+  });
+
   return router;
 }

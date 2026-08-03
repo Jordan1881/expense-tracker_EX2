@@ -59,3 +59,27 @@ export async function createExpense(
   }
   return (await response.json()) as Expense;
 }
+
+export async function updateExpense(
+  id: string,
+  payload: CreateExpensePayload,
+): Promise<Expense> {
+  const response = await fetch(`${API_BASE_URL}/expenses/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) {
+    throw new Error(await parseError(response));
+  }
+  return (await response.json()) as Expense;
+}
+
+export async function deleteExpense(id: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/expenses/${id}`, {
+    method: "DELETE",
+  });
+  if (!response.ok) {
+    throw new Error(await parseError(response));
+  }
+}

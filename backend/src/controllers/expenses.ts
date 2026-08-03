@@ -27,7 +27,30 @@ export function createExpensesController(service: ExpenseService) {
         handleError(res, error);
       }
     },
+
+    async update(req: Request, res: Response): Promise<void> {
+      try {
+        const expense = await service.update(routeId(req), req.body ?? {});
+        res.status(200).json(expense);
+      } catch (error) {
+        handleError(res, error);
+      }
+    },
+
+    async remove(req: Request, res: Response): Promise<void> {
+      try {
+        await service.remove(routeId(req));
+        res.status(204).send();
+      } catch (error) {
+        handleError(res, error);
+      }
+    },
   };
+}
+
+function routeId(req: Request): string {
+  const id = req.params.id;
+  return Array.isArray(id) ? id[0]! : id;
 }
 
 function queryString(value: unknown): string | undefined {

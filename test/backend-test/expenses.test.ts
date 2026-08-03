@@ -292,4 +292,87 @@ describe("Expenses API", () => {
       expect(response.body.error).toMatch(/category/i);
     });
   });
+
+  describe("PATCH /api/expenses/:id", () => {
+    it("updates an expense", async () => {
+      const created = await request(app).post("/api/expenses").send({
+        amountMinor: 1000,
+        currency: "ILS",
+        date: "2026-08-01",
+        categoryId: foodId,
+        note: "old",
+      });
+
+      const response = await request(app)
+        .patch(`/api/expenses/${created.body.id}`)
+        .send({
+          amountMinor: 2500,
+          currency: "USD",
+          date: "2026-08-02",
+          categoryId: foodId,
+          note: "updated",
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toMatchObject({
+        amountMinor: 2500,
+        currency: "USD",
+        date: "2026-08-02",
+        note: "updated",
+      });
+    });
+
+    it("returns 404 for missing expense", async () => {
+      const response = await request(app)
+        .patch("/api/expenses/missing-id")
+        .send({
+          amountMinor: 100,
+          currency: "ILS",
+          date: "2026-08-01",
+          categoryId: foodId,
+        });
+      expect(response.status).toBe(404);
+    });
+
+    it("rejects invalid amount on update", async () => {
+      const created = await request(app).post("/api/expenses").send({
+        amountMinor: 1000,
+        currency: "ILS",
+        date: "2026-08-01",
+        categoryId: foodId,
+      });
+      const response = await request(app)
+        .patch(`/api/expenses/${created.body.id}`)
+        .send({
+          amountMinor: -1,
+          currency: "ILS",
+          date: "2026-08-01",
+          categoryId: foodId,
+        });
+      expect(response.status).toBe(400);
+    });
+  });
+
+  describe("DELETE /api/expenses/:id", () => {
+    it("deletes an expense", async () => {
+      const created = await request(app).post("/api/expenses").send({
+        amountMinor: 1000,
+        currency: "ILS",
+        date: "2026-08-01",
+        categoryId: foodId,
+      });
+      const response = await request(app).delete(
+        `/api/expenses/${created.body.id}`,
+      );
+      expect(response.status).toBe(204);
+
+      const list = await request(app).get("/api/expenses");
+      expect(list.body).toEqual([]);
+    });
+
+    it("returns 404 for missing expense", async () => {
+      const response = await request(app).delete("/api/expenses/missing-id");
+      expect(response.status).toBe(404);
+    });
+  });
 });
