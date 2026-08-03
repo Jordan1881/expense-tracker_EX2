@@ -9,6 +9,12 @@ export type CreateExpensePayload = {
   categoryId: string;
 };
 
+export type ExpenseListFilters = {
+  categoryId?: string;
+  from?: string;
+  to?: string;
+};
+
 async function parseError(response: Response): Promise<string> {
   try {
     const body = (await response.json()) as { error?: string };
@@ -21,8 +27,19 @@ async function parseError(response: Response): Promise<string> {
   return `Request failed (${response.status})`;
 }
 
-export async function listExpenses(): Promise<Expense[]> {
-  const response = await fetch(`${API_BASE_URL}/expenses`);
+export async function listExpenses(
+  filters: ExpenseListFilters = {},
+): Promise<Expense[]> {
+  const params = new URLSearchParams();
+  if (filters.categoryId) params.set("categoryId", filters.categoryId);
+  if (filters.from) params.set("from", filters.from);
+  if (filters.to) params.set("to", filters.to);
+  const query = params.toString();
+  const url = query
+    ? `${API_BASE_URL}/expenses?${query}`
+    : `${API_BASE_URL}/expenses`;
+
+  const response = await fetch(url);
   if (!response.ok) {
     throw new Error(await parseError(response));
   }

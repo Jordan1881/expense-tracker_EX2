@@ -5,9 +5,15 @@ type ExpenseListProps = {
   expenses: Expense[];
   loading: boolean;
   error: string | null;
+  filtersActive?: boolean;
 };
 
-export function ExpenseList({ expenses, loading, error }: ExpenseListProps) {
+export function ExpenseList({
+  expenses,
+  loading,
+  error,
+  filtersActive = false,
+}: ExpenseListProps) {
   if (loading) {
     return <p className="mt-2 text-sm text-slate-500">Loading expenses…</p>;
   }
@@ -23,7 +29,9 @@ export function ExpenseList({ expenses, loading, error }: ExpenseListProps) {
   if (expenses.length === 0) {
     return (
       <p className="mt-2 text-sm text-slate-500">
-        No expenses yet. Add one using the form.
+        {filtersActive
+          ? "No expenses match these filters."
+          : "No expenses yet. Add one using the form."}
       </p>
     );
   }

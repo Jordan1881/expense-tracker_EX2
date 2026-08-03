@@ -3,9 +3,16 @@ import { ExpenseError, type ExpenseService } from "../services/expenses.js";
 
 export function createExpensesController(service: ExpenseService) {
   return {
-    async list(_req: Request, res: Response): Promise<void> {
+    async list(req: Request, res: Response): Promise<void> {
       try {
-        const expenses = await service.list();
+        const categoryId = queryString(req.query.categoryId);
+        const from = queryString(req.query.from);
+        const to = queryString(req.query.to);
+        const expenses = await service.list({
+          ...(categoryId !== undefined ? { categoryId } : {}),
+          ...(from !== undefined ? { from } : {}),
+          ...(to !== undefined ? { to } : {}),
+        });
         res.status(200).json(expenses);
       } catch (error) {
         handleError(res, error);
@@ -21,6 +28,15 @@ export function createExpensesController(service: ExpenseService) {
       }
     },
   };
+}
+
+function queryString(value: unknown): string | undefined {
+  if (value === undefined) return undefined;
+  if (Array.isArray(value)) {
+    const first = value[0];
+    return typeof first === "string" ? first : undefined;
+  }
+  return typeof value === "string" ? value : undefined;
 }
 
 function handleError(res: Response, error: unknown): void {

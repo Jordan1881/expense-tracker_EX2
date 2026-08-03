@@ -95,10 +95,68 @@ export type CreateExpenseInput = {
   categoryId?: unknown;
 };
 
+export type ListExpensesFilters = {
+  categoryId?: string;
+  from?: string;
+  to?: string;
+};
+
+function parseOptionalDateBound(raw: string, bound: "start" | "end"): Date {
+  const trimmed = raw.trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+    throw new ExpenseError(
+      `${bound === "start" ? "from" : "to"} must be YYYY-MM-DD`,
+      400,
+    );
+  }
+  const iso =
+    bound === "start" ? `${trimmed}T00:00:00.000Z` : `${trimmed}T23:59:59.999Z`;
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) {
+    throw new ExpenseError(
+      `${bound === "start" ? "from" : "to"} must be a valid date`,
+      400,
+    );
+  }
+  return date;
+}
+
 export function createExpenseService(prisma: PrismaClient) {
   return {
-    async list(): Promise<ExpenseDto[]> {
+    async list(filters: ListExpensesFilters = {}): Promise<ExpenseDto[]> {
+      const where: {
+        categoryId?: string;
+        date?: { gte?: Date; lte?: Date };
+      } = {};
+
+      if (filters.categoryId !== undefined && filters.categoryId !== "") {
+        where.categoryId = filters.categoryId;
+      }
+
+      if (filters.from !== undefined && filters.from !== "") {
+        where.date = {
+          ...where.date,
+          gte: parseOptionalDateBound(filters.from, "start"),
+        };
+      }
+
+      if (filters.to !== undefined && filters.to !== "") {
+        where.date = {
+          ...where.date,
+          lte: parseOptionalDateBound(filters.to, "end"),
+        };
+      }
+
+      if (
+        where.date?.gte &&
+        where.date?.lte &&
+        where.date.gte.getTime() > where.date.lte.getTime()
+      ) {
+        throw new ExpenseError("`from` must be on or before `to`", 400);
+      }
+
       const expenses = await prisma.expense.findMany({
+        where,
         include: { category: { select: { id: true, name: true } } },
         orderBy: [{ date: "desc" }, { createdAt: "desc" }],
       });

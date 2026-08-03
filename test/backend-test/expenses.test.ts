@@ -62,6 +62,128 @@ describe("Expenses API", () => {
       expect(response.body[0].date).toBe("2026-08-01");
       expect(response.body[1].date).toBe("2026-01-01");
     });
+
+    it("filters by categoryId", async () => {
+      const transport = await prisma.category.findUniqueOrThrow({
+        where: { name: "Transport" },
+      });
+      await request(app).post("/api/expenses").send({
+        amountMinor: 100,
+        currency: "ILS",
+        date: "2026-08-01",
+        categoryId: foodId,
+      });
+      await request(app).post("/api/expenses").send({
+        amountMinor: 200,
+        currency: "ILS",
+        date: "2026-08-02",
+        categoryId: transport.id,
+      });
+
+      const response = await request(app)
+        .get("/api/expenses")
+        .query({ categoryId: transport.id });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveLength(1);
+      expect(response.body[0].categoryId).toBe(transport.id);
+    });
+
+    it("filters by date range inclusive", async () => {
+      await request(app).post("/api/expenses").send({
+        amountMinor: 100,
+        currency: "ILS",
+        date: "2026-07-01",
+        categoryId: foodId,
+      });
+      await request(app).post("/api/expenses").send({
+        amountMinor: 200,
+        currency: "ILS",
+        date: "2026-08-15",
+        categoryId: foodId,
+      });
+      await request(app).post("/api/expenses").send({
+        amountMinor: 300,
+        currency: "ILS",
+        date: "2026-09-01",
+        categoryId: foodId,
+      });
+
+      const response = await request(app)
+        .get("/api/expenses")
+        .query({ from: "2026-08-01", to: "2026-08-31" });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveLength(1);
+      expect(response.body[0].date).toBe("2026-08-15");
+    });
+
+    it("combines category and date filters", async () => {
+      const transport = await prisma.category.findUniqueOrThrow({
+        where: { name: "Transport" },
+      });
+      await request(app).post("/api/expenses").send({
+        amountMinor: 100,
+        currency: "ILS",
+        date: "2026-08-10",
+        categoryId: foodId,
+      });
+      await request(app).post("/api/expenses").send({
+        amountMinor: 200,
+        currency: "ILS",
+        date: "2026-08-10",
+        categoryId: transport.id,
+      });
+      await request(app).post("/api/expenses").send({
+        amountMinor: 300,
+        currency: "ILS",
+        date: "2026-07-10",
+        categoryId: transport.id,
+      });
+
+      const response = await request(app).get("/api/expenses").query({
+        categoryId: transport.id,
+        from: "2026-08-01",
+        to: "2026-08-31",
+      });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveLength(1);
+      expect(response.body[0]).toMatchObject({
+        categoryId: transport.id,
+        date: "2026-08-10",
+      });
+    });
+
+    it("returns empty list when filters match nothing", async () => {
+      await request(app).post("/api/expenses").send({
+        amountMinor: 100,
+        currency: "ILS",
+        date: "2026-08-01",
+        categoryId: foodId,
+      });
+
+      const response = await request(app)
+        .get("/api/expenses")
+        .query({ from: "2020-01-01", to: "2020-12-31" });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual([]);
+    });
+
+    it("rejects invalid from date", async () => {
+      const response = await request(app)
+        .get("/api/expenses")
+        .query({ from: "not-a-date" });
+      expect(response.status).toBe(400);
+    });
+
+    it("rejects from after to", async () => {
+      const response = await request(app)
+        .get("/api/expenses")
+        .query({ from: "2026-08-31", to: "2026-08-01" });
+      expect(response.status).toBe(400);
+    });
   });
 
   describe("POST /api/expenses", () => {

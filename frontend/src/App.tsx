@@ -1,21 +1,27 @@
 import { useCallback, useEffect, useState } from "react";
 import { CategoriesPanel } from "./components/CategoriesPanel";
+import { ExpenseFilters } from "./components/ExpenseFilters";
 import { ExpenseForm } from "./components/ExpenseForm";
 import { ExpenseList } from "./components/ExpenseList";
 import type { Expense } from "./types/expense";
-import { listExpenses } from "./utils/expensesApi";
+import { listExpenses, type ExpenseListFilters } from "./utils/expensesApi";
 
 function App() {
   const [categoriesOpen, setCategoriesOpen] = useState(false);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [expensesLoading, setExpensesLoading] = useState(true);
   const [expensesError, setExpensesError] = useState<string | null>(null);
+  const [filters, setFilters] = useState<ExpenseListFilters>({});
+
+  const filtersActive = Boolean(
+    filters.categoryId || filters.from || filters.to,
+  );
 
   const refreshExpenses = useCallback(async () => {
     setExpensesError(null);
     setExpensesLoading(true);
     try {
-      const list = await listExpenses();
+      const list = await listExpenses(filters);
       setExpenses(list);
     } catch (err) {
       setExpensesError(
@@ -24,7 +30,7 @@ function App() {
     } finally {
       setExpensesLoading(false);
     }
-  }, []);
+  }, [filters]);
 
   useEffect(() => {
     void refreshExpenses();
@@ -67,10 +73,12 @@ function App() {
               Manage categories
             </button>
           </div>
+          <ExpenseFilters value={filters} onChange={setFilters} />
           <ExpenseList
             expenses={expenses}
             loading={expensesLoading}
             error={expensesError}
+            filtersActive={filtersActive}
           />
         </section>
       </div>
