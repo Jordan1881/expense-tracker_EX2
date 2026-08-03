@@ -6,6 +6,8 @@ type ExpenseListProps = {
   loading: boolean;
   error: string | null;
   filtersActive?: boolean;
+  onEdit: (expense: Expense) => void;
+  onDelete: (expense: Expense) => void;
 };
 
 export function ExpenseList({
@@ -13,6 +15,8 @@ export function ExpenseList({
   loading,
   error,
   filtersActive = false,
+  onEdit,
+  onDelete,
 }: ExpenseListProps) {
   if (loading) {
     return <p className="mt-2 text-sm text-slate-500">Loading expenses…</p>;
@@ -44,7 +48,8 @@ export function ExpenseList({
             <th className="py-2 pr-4 font-medium">Date</th>
             <th className="py-2 pr-4 font-medium">Category</th>
             <th className="py-2 pr-4 font-medium">Amount</th>
-            <th className="py-2 font-medium">Note</th>
+            <th className="py-2 pr-4 font-medium">Note</th>
+            <th className="py-2 font-medium">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -55,7 +60,27 @@ export function ExpenseList({
               <td className="py-2 pr-4">
                 {formatMoney(expense.amountMinor, expense.currency)}
               </td>
-              <td className="py-2 text-slate-600">{expense.note ?? "—"}</td>
+              <td className="py-2 pr-4 text-slate-600">
+                {expense.note ?? "—"}
+              </td>
+              <td className="py-2">
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    className="text-sm underline"
+                    onClick={() => onEdit(expense)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    className="text-sm text-red-700 underline"
+                    onClick={() => onDelete(expense)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </td>
             </tr>
           ))}
         </tbody>

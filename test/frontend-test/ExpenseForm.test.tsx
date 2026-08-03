@@ -38,6 +38,10 @@ describe("Add expense form → list", () => {
           return jsonResponse(seedCategories);
         }
 
+        if (url.includes("/summary/by-category") && method === "GET") {
+          return jsonResponse([]);
+        }
+
         if (url.endsWith("/expenses") && method === "GET") {
           return jsonResponse(expensesStore);
         }

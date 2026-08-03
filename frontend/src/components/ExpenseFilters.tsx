@@ -6,9 +6,15 @@ import { listCategories } from "../utils/categoriesApi";
 type ExpenseFiltersProps = {
   value: ExpenseListFilters;
   onChange: (next: ExpenseListFilters) => void;
+  /** Bump after category manage so the select reloads. */
+  categoriesRevision?: number;
 };
 
-export function ExpenseFilters({ value, onChange }: ExpenseFiltersProps) {
+export function ExpenseFilters({
+  value,
+  onChange,
+  categoriesRevision = 0,
+}: ExpenseFiltersProps) {
   const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
@@ -24,7 +30,7 @@ export function ExpenseFilters({ value, onChange }: ExpenseFiltersProps) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [categoriesRevision]);
 
   const hasFilters = Boolean(value.categoryId || value.from || value.to);
 
