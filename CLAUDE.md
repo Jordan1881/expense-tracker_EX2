@@ -104,4 +104,4 @@ npm run db:seed
 
 ## Current scaffold status
 
-Scaffold is in place. Feature endpoints may return `501` until implemented via TDD after user approval.
+Scaffold is in place. **Categories** (`/api/categories` + Manage Categories panel) are implemented. Other feature endpoints may still return `501` until built via TDD after approval.

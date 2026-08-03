@@ -1,15 +1,28 @@
 import { Router } from "express";
+import type { PrismaClient } from "@prisma/client";
+import { createCategoriesController } from "../controllers/categories.js";
+import { createCategoryService } from "../services/categories.js";
 
-/**
- * Category routes — implement with TDD (see test/backend-test).
- * Scaffold only: stub endpoints so the API surface is discoverable.
- */
-export const categoriesRouter = Router();
+export function createCategoriesRouter(prisma: PrismaClient) {
+  const router = Router();
+  const service = createCategoryService(prisma);
+  const controller = createCategoriesController(service);
 
-categoriesRouter.get("/", (_req, res) => {
-  res.status(501).json({ error: "Not implemented" });
-});
+  router.get("/", (req, res) => {
+    void controller.list(req, res);
+  });
 
-categoriesRouter.post("/", (_req, res) => {
-  res.status(501).json({ error: "Not implemented" });
-});
+  router.post("/", (req, res) => {
+    void controller.create(req, res);
+  });
+
+  router.patch("/:id", (req, res) => {
+    void controller.rename(req, res);
+  });
+
+  router.delete("/:id", (req, res) => {
+    void controller.remove(req, res);
+  });
+
+  return router;
+}
