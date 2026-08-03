@@ -1,8 +1,5 @@
 import type { Request, Response } from "express";
-import {
-  CategoryError,
-  type CategoryService,
-} from "../services/categories.js";
+import { CategoryError, type CategoryService } from "../services/categories.js";
 
 export function createCategoriesController(service: CategoryService) {
   return {

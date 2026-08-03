@@ -121,4 +121,4 @@ npm run db:seed
 
 ## Current scaffold status
 
-Scaffold is in place. **Categories** (`/api/categories` + Manage Categories panel) are implemented. Other feature endpoints may still return `501` until built via TDD after approval.
+Scaffold is in place. **Categories** and **add expense** (form → list) are implemented. Filters, edit/delete expense, category summary, and full E2E hardening remain for later tickets.

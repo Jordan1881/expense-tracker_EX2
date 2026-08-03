@@ -474,7 +474,9 @@ describe("Categories API", () => {
         },
       });
 
-      await request(app).delete(`/api/categories/${created.body.id}`).expect(204);
+      await request(app)
+        .delete(`/api/categories/${created.body.id}`)
+        .expect(204);
 
       const still = await prisma.expense.findUniqueOrThrow({
         where: { id: onOther.id },

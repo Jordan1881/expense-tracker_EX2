@@ -1,15 +1,20 @@
 import { Router } from "express";
+import type { PrismaClient } from "@prisma/client";
+import { createExpensesController } from "../controllers/expenses.js";
+import { createExpenseService } from "../services/expenses.js";
 
-/**
- * Expense routes — implement with TDD (see test/backend-test).
- * Scaffold only: stub endpoints so the API surface is discoverable.
- */
-export const expensesRouter = Router();
+export function createExpensesRouter(prisma: PrismaClient) {
+  const router = Router();
+  const service = createExpenseService(prisma);
+  const controller = createExpensesController(service);
 
-expensesRouter.get("/", (_req, res) => {
-  res.status(501).json({ error: "Not implemented" });
-});
+  router.get("/", (req, res) => {
+    void controller.list(req, res);
+  });
 
-expensesRouter.post("/", (_req, res) => {
-  res.status(501).json({ error: "Not implemented" });
-});
+  router.post("/", (req, res) => {
+    void controller.create(req, res);
+  });
+
+  return router;
+}

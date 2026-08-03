@@ -49,7 +49,10 @@ export function createCategoryService(prisma: PrismaClient) {
       const name = normalizeName(rawName);
       const existing = await prisma.category.findUnique({ where: { name } });
       if (existing) {
-        throw new CategoryError("A category with this name already exists", 409);
+        throw new CategoryError(
+          "A category with this name already exists",
+          409,
+        );
       }
 
       const category = await prisma.category.create({

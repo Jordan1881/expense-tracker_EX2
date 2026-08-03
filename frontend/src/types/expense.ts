@@ -5,8 +5,9 @@ export type Expense = {
   amountMinor: number;
   currency: CurrencyCode;
   date: string;
-  note?: string;
+  note?: string | null;
   categoryId: string;
+  categoryName: string;
 };
 
 export type Category = {
