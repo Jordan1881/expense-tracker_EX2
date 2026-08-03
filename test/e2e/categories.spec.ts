@@ -88,6 +88,23 @@ test.describe("Manage Categories panel", () => {
     await expect(page.getByTestId("category-row-Gym")).toHaveCount(0);
   });
 
+  test("rejects rename collisions", async ({ page }) => {
+    await openPanel(page);
+
+    await page.getByTestId("category-name-input").fill("Gym");
+    await page.getByTestId("add-category-button").click();
+    await expect(page.getByTestId("category-row-Gym")).toBeVisible();
+
+    await page.getByTestId("rename-Gym").click();
+    await page.getByTestId("rename-category-input").fill("Food");
+    await page.getByTestId("save-rename-button").click();
+
+    await expect(page.getByTestId("categories-error")).toContainText(
+      /exists|duplicate|already/i,
+    );
+    await expect(page.getByTestId("category-row-Gym")).toBeVisible();
+  });
+
   test("deletes an unused category", async ({ page }) => {
     await openPanel(page);
 
