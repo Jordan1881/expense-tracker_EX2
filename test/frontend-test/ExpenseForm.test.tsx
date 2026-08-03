@@ -96,7 +96,9 @@ describe("Add expense form → list", () => {
   it("adds an expense with a note and shows it in the list", async () => {
     render(<App />);
 
-    await screen.findByLabelText("Category");
+    await screen.findByLabelText((text, el) => {
+      return text === "Category" && el?.id === "expense-category";
+    });
     fireEvent.change(screen.getByLabelText("Amount"), {
       target: { value: "49.90" },
     });
@@ -120,7 +122,9 @@ describe("Add expense form → list", () => {
   it("adds an expense without a note", async () => {
     render(<App />);
 
-    await screen.findByLabelText("Category");
+    await screen.findByLabelText((text, el) => {
+      return text === "Category" && el?.id === "expense-category";
+    });
     fireEvent.change(screen.getByLabelText("Amount"), {
       target: { value: "10" },
     });
@@ -140,7 +144,9 @@ describe("Add expense form → list", () => {
   it("shows validation error for invalid amount", async () => {
     render(<App />);
 
-    await screen.findByLabelText("Category");
+    await screen.findByLabelText((text, el) => {
+      return text === "Category" && el?.id === "expense-category";
+    });
     fireEvent.change(screen.getByLabelText("Amount"), {
       target: { value: "abc" },
     });
