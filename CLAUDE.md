@@ -23,6 +23,19 @@ A task is done only when:
 - Prefer **small vertical slices** (e.g. one API + its tests) over large bangs.
 - **No drive-by refactors** — do not rename/move unrelated files while shipping a feature.
 
+## Anti-patterns / hard boundaries
+
+Agents must **not**:
+
+1. Ship feature or API code **without a failing test first** (TDD).
+2. Implement **beyond the approved slice** — no “while I’m here” extras.
+3. Add **new dependencies** without asking.
+4. Change **schema or API contracts** without approval and a `CLAUDE.md` update.
+5. Invent **folders or patterns** outside the agreed layout.
+6. Weaken **domain rules** — e.g. floats as money source of truth, deleting **Other**, summing totals across currencies, silently adding auth or FX.
+7. **Commit or push** unless the user explicitly asks.
+8. Silence TypeScript or ESLint to “make it pass” (`any`, blanket `eslint-disable`, skipping checks).
+
 ## Product summary
 
 Personal **Expense Tracker**: add expenses, list them, summarize by category (totals broken down by currency), filter by date/category, and manage categories from a panel/slide-over on a **single-page** shell.
@@ -40,15 +53,16 @@ Personal **Expense Tracker**: add expenses, list them, summarize by category (to
 
 ## Stack
 
-| Layer | Tech |
-|-------|------|
-| Monorepo | npm workspaces (`frontend`, `backend`) |
-| Frontend | React + Vite + TypeScript + Tailwind |
-| Backend | Express + TypeScript |
-| DB | Prisma + SQLite |
-| Unit/integration | Vitest (FE: RTL; BE: Supertest) |
-| E2E | Playwright |
-| Shared types | **No** shared package; **no** Zod — API responses are the contract; mirror types on the FE |
+| Layer            | Tech                                                                                       |
+| ---------------- | ------------------------------------------------------------------------------------------ |
+| Monorepo         | npm workspaces (`frontend`, `backend`)                                                     |
+| Frontend         | React + Vite + TypeScript + Tailwind                                                       |
+| Backend          | Express + TypeScript                                                                       |
+| DB               | Prisma + SQLite                                                                            |
+| Lint/format      | ESLint + Prettier (root)                                                                   |
+| Unit/integration | Vitest (FE: RTL; BE: Supertest)                                                            |
+| E2E              | Playwright                                                                                 |
+| Shared types     | **No** shared package; **no** Zod — API responses are the contract; mirror types on the FE |
 
 ## Layout
 
@@ -97,6 +111,9 @@ npm run test:frontend
 npm run test:backend
 npm run test:e2e
 npm run typecheck
+npm run lint
+npm run format
+npm run format:check
 npm run db:generate
 npm run db:migrate
 npm run db:seed

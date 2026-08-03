@@ -30,8 +30,8 @@ npm run db:seed --workspace=backend
 npm run dev
 ```
 
-- Frontend: http://localhost:5173  
-- Backend: http://localhost:3001  
+- Frontend: http://localhost:5173
+- Backend: http://localhost:3001
 
 ## Test
 
@@ -40,6 +40,14 @@ npm test                 # frontend + backend unit/integration
 npm run test:frontend
 npm run test:backend
 npm run test:e2e         # Playwright (starts both servers)
+```
+
+## Lint & format
+
+```bash
+npm run lint
+npm run format
+npm run format:check
 ```
 
 ## Agent guide

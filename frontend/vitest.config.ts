@@ -13,6 +13,8 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     setupFiles: [path.join(rootDir, "../test/frontend-test/setup.ts")],
-    include: [path.join(rootDir, "../test/frontend-test/**/*.{test,spec}.{ts,tsx}")],
+    include: [
+      path.join(rootDir, "../test/frontend-test/**/*.{test,spec}.{ts,tsx}"),
+    ],
   },
 });

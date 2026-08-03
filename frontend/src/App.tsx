@@ -2,7 +2,9 @@ function App() {
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
       <header className="border-b border-slate-200 bg-white px-6 py-4">
-        <h1 className="text-2xl font-semibold tracking-tight">Expense Tracker</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">
+          Expense Tracker
+        </h1>
         <p className="mt-1 text-sm text-slate-600">
           Scaffold ready — features land via TDD after approval.
         </p>
