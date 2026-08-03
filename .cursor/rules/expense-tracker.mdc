@@ -1,0 +1,10 @@
+---
+description: Expense Tracker project rules — defer to CLAUDE.md
+alwaysApply: true
+---
+
+# Expense Tracker
+
+Follow the root **`CLAUDE.md`** as the authoritative project guide (stack, domain rules, TDD, collaboration, definition of done, commands).
+
+Do not duplicate or contradict `CLAUDE.md`. If guidance conflicts, **`CLAUDE.md` wins** — update it (with user approval) rather than forking rules here.

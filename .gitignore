@@ -1,0 +1,15 @@
+node_modules/
+dist/
+build/
+coverage/
+.env
+*.db
+*.db-journal
+playwright-report/
+test-results/
+.DS_Store
+*.log
+frontend/dist/
+backend/dist/
+backend/prisma/dev.db
+backend/prisma/dev.db-journal
